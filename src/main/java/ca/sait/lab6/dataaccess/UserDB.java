@@ -30,7 +30,7 @@ public class UserDB {
                 String lastName = rs.getString(4);
                 String password = rs.getString(5);
                 int roleId = rs.getInt(6);
-                String roldName = rs.getString(7);
+                String roldName = rs.getString(8);
                 
                 Role role = new Role(roleId, roldName);
                 User user = new User(email, active, firstName, lastName, password, role);
@@ -64,7 +64,7 @@ public class UserDB {
                 String lastName = rs.getString(4);
                 String password = rs.getString(5);
                 int roleId = rs.getInt(6);
-                String roldName = rs.getString(7);
+                String roldName = rs.getString(8);
                 
                 Role role = new Role(roleId, roldName);
                 user = new User(email, active, firstName, lastName, password, role);
@@ -82,7 +82,7 @@ public class UserDB {
         ConnectionPool cp = ConnectionPool.getInstance();
         Connection con = cp.getConnection();
         PreparedStatement ps = null;
-        String sql = "INSERT INTO user (email, first_name, last_name, password, role) VALUES (, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO user (email, first_name, last_name, password, role) VALUES (?, ?, ?, ?, ?)";
         
         boolean inserted = false;
         try {
@@ -106,7 +106,7 @@ public class UserDB {
         ConnectionPool cp = ConnectionPool.getInstance();
         Connection con = cp.getConnection();
         PreparedStatement ps = null;
-        String sql = "UPDATE user SET first_name=?, last_name=?, password=?, role=? WHERE email=?";
+        String sql = "UPDATE user SET first_name=?, last_name=?, password=?, active=?, role=? WHERE email=?";
         
         boolean updated = false;
         
@@ -115,8 +115,15 @@ public class UserDB {
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getPassword());
-            ps.setInt(4, user.getRole().getId());
-            ps.setString(5, user.getEmail());
+            if(user.isActive()) {
+                ps.setInt(4, 1);
+            }
+            else {
+                 ps.setInt(4, 0);
+            }
+            
+            ps.setInt(5, user.getRole().getId());
+            ps.setString(6, user.getEmail());
             
             updated = (ps.executeUpdate() != 0);
         } finally {
